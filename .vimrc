@@ -11,6 +11,10 @@ set si
 set nu
 syntax on
 
+if exists('$TMUX')
+    set term=screen-256color
+endif
+
 set backspace=2 " now it works properly!
 
 au FileType html setlocal ts=2 sw=2 sts=2
