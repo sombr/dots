@@ -11,6 +11,19 @@ set si
 set nu
 syntax on
 
+" Disable Ex mode
+nnoremap Q <nop>
+
+" ----- Spell check -----
+" Git commits.
+autocmd FileType gitcommit setlocal spell
+"
+" " Subversion commits.
+autocmd FileType svn       setlocal spell
+"
+" " Mercurial commits.
+autocmd FileType asciidoc  setlocal spell
+
 if exists('$TMUX')
     set term=screen-256color
 endif
