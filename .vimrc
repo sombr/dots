@@ -1,7 +1,7 @@
 set nocp
 set ttyfast
 set t_Co=256
-colors twilight256
+
 filetype on
 filetype plugin on
 filetype indent on
@@ -9,8 +9,18 @@ set tabstop=4 shiftwidth=4 expandtab
 set ai
 set si
 set nu
+
+set formatprg=par
+
+set hlsearch
+nnoremap <CR> :nohlsearch<CR><CR>
+
 syntax on
 
+set statusline+=%#warningmsg#
+set statusline+=%*
+
+let g:airline_powerline_fonts = 1
 " Disable Ex mode
 nnoremap Q <nop>
 
@@ -23,10 +33,6 @@ autocmd FileType svn       setlocal spell
 "
 " " Mercurial commits.
 autocmd FileType asciidoc  setlocal spell
-
-if exists('$TMUX')
-    set term=screen-256color
-endif
 
 set backspace=2 " now it works properly!
 
@@ -45,64 +51,55 @@ set wildmode=list:longest " consistent with bash
 let mapleader = ","
 let g:mapleader = ","
 set laststatus=2
-set statusline=%f%m%r%h%w\ %y\ branch:%{branch}%=col:%2c\ line:%2l/%L\ [%2p%%]
 
-function FixSpaces()
-    %s/^\(.*\S\)\s*$/\1/g
-endfunction
-
-function Comment()
-    '<,'>s/^/#/g
-endfunction
-
-function UnComment()
-    '<,'>s/^#//g
-endfunction
-
-function Pod(word)
-    let cline = line('.')
-    let pl = getline(cline)
-    split pod
-    let cmd = "read !echo '" . pl . "±§±" . a:word .  "'|perl -e '$_=<>; ($a, $b) = split(/±§±/, $_); chomp $b; $a =~ /([\\w:]*?$b[\\w:]*)/; print $1;' | xargs perldoc -t "
-    return cmd
-endfunction
-
-function GetBranch()
-    return system("git branch | grep '*' | perl -e '$_ = <STDIN>; chomp $_; $_ =~ s/[^\\w\\d_]+//g; print $_;'")
-endfunction
-
-function MakeTestFile()
-    if isdirectory("lib")
-        if !isdirectory("t")
-            call mkdir("t", "p")
-        endif
-        let package = search("package\\s\\+\\S\\+;", "bsW")
-        if package
-            Wyt;
-            g'
-        endif
-        tabedit t/test
-        
-    endif
-endfunction
-
-let branch = GetBranch()
-
-map <C-E> $a
-map <C-A> ^i
-imap <C-E> $a
-imap <C-A> ^i
-
-map <Leader>f <ESC>:execute FixSpaces()<RETURN>
-
-vmap <Leader>c :<C-U>call Comment()<CR>
-vmap <Leader>C :<C-U>call UnComment()<CR>
+" disable, because I don't really use them, but Ctrl-y,e are quite nice on their own
+"map <C-E> $a
+"map <C-A> ^i
+"imap <C-E> $a
+"imap <C-A> ^i
 
 setlocal errorformat=line\ %l.
 setlocal makeprg=perl\ -c\ %
 
 set runtimepath^=~/.vim/bundle/ctrlp.vim
+set runtimepath+=~/.vim/snippets
+
+set path+=acceptance
+set path+=src
+set path+=tst
+
+let g:UltiSnipsSnippetDirectories=["usnippets"]
+let g:UltiSnipsSnippetsDir="~/.vim/snippets/usnippets"
+
 let g:ctrlp_max_files=0
 set wildignore+=*/tmp/*,*.so,*.swp,*.deb
 
+" The Silver Searcher
+if executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching = 0
+endif
+
 execute pathogen#infect()
+"colors twilight256
+"colors wombat256
+"colors gruvbox
+colors mytwilight
+
+map JI :JavaImport<CR>
+map JO :JavaImportOrganize<CR>:%!imports<CR>
+map JS :JavaSearch<CR>
+map JC :JavaCorrect<CR>
+map CC :%s/\s\+$//g<CR>
+map JU :JUnit %<CR>
+
+map { :tabprev<CR>
+map } :tabnext<CR>
+
+set showbreak=↪
